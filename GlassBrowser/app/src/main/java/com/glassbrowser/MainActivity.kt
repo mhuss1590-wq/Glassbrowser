@@ -217,6 +217,12 @@ class MainActivity : Activity() {
     private fun hdrs(): Map<String, String> =
         if (cfg["dnt"] == "1") mapOf("DNT" to "1", "Sec-GPC" to "1") else emptyMap()
 
+    private fun cfgJson(): JSONObject {
+        val o = JSONObject()
+        for ((k, v) in cfg) o.put(k, v)
+        return o
+    }
+
     private fun day() = System.currentTimeMillis() / 86_400_000L
 
     private fun flushStats() {
@@ -901,7 +907,7 @@ background:radial-gradient(70% 50% at 20% 10%,#7c4dff88,transparent),radial-grad
         @JavascriptInterface fun quit() { runOnUiThread { saveSession(); finish() } }
 
         // settings
-        @JavascriptInterface fun settings(): String = JSONObject(HashMap(cfg)).toString()
+        @JavascriptInterface fun settings(): String = cfgJson().toString()
         @JavascriptInterface fun set(k: String, v: String) {
             if (!DEF.containsKey(k)) return
             cfg[k] = v
@@ -1024,7 +1030,7 @@ background:radial-gradient(70% 50% at 20% 10%,#7c4dff88,transparent),radial-grad
                     val ls = try { JSONArray("[$r]").getString(0) } catch (e: Exception) { "{}" }
                     val o = JSONObject()
                     o.put("ls", JSONObject(ls))
-                    o.put("settings", JSONObject(HashMap(cfg)))
+                    o.put("settings", cfgJson())
                     o.put("us", sp.getString("us", "[]"))
                     backupData = o.toString()
                     try {
